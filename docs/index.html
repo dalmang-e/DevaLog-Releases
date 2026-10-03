@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>데바로그 · 아이온2 숙제 자동 기록</title>
+<meta name="description" content="게임은 네가, 기록은 내가! 데바로그만 켜 두면 아이온2 캐릭터의 숙제 정보가 표에 저절로 채워져요. 무료 Windows 앱.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="데바로그 · 아이온2 숙제 자동 기록">
+<meta property="og:description" content="게임은 네가, 기록은 내가! 데바로그만 켜 두면 캐릭터의 숙제 정보가 표에 저절로 채워져요.">
+<meta property="og:image" content="https://dalmang-e.github.io/DevaLog-Releases/assets/icon.png">
+<meta property="og:url" content="https://dalmang-e.github.io/DevaLog-Releases/">
+<meta name="theme-color" content="#141129">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+@font-face{font-family:"Galmuri11";font-weight:700;src:url(assets/fonts/galmuri11-bold.woff2) format("woff2")}
+@font-face{font-family:"Galmuri11";font-weight:400;src:url(assets/fonts/galmuri11.woff2) format("woff2")}
+/* A 분위기(밤하늘, 도트 제목, 계단 모서리) + B 구성. 흰 테두리 없이 면 색 차이로 구분하고, 도트 글꼴은 큰 제목에만. 단일 다크 세계. */
+:root{
+  --night:#141129; --panel:#1f1a3f; --panel2:#2a2453; --line:#352e66;
+  --text:#f6f3ff; --sub:#d3cdf2; --dim:#a29cce;
+  --violet:#9aa4ff; --mint:#8fe5c9; --pink:#ff9cc0; --gold:#ffd66b;
+  --px:"Galmuri11","Noto Sans KR",monospace; --body:"Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+  --notch:polygon(0 8px,4px 8px,4px 4px,8px 4px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 4px,calc(100% - 4px) 4px,calc(100% - 4px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 4px) calc(100% - 8px),calc(100% - 4px) calc(100% - 4px),calc(100% - 8px) calc(100% - 4px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 4px),4px calc(100% - 4px),4px calc(100% - 8px),0 calc(100% - 8px));
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--night);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.75;
+  background-image:radial-gradient(#ffffff16 1px,transparent 1.5px),radial-gradient(#ffffff0d 1px,transparent 1.5px);background-size:48px 48px,77px 77px;background-position:0 0,20px 30px}
+a{color:var(--mint)}
+img{max-width:100%}
+.pixel{image-rendering:pixelated}
+.px{font-family:var(--px)}
+
+.bar{background:#100d22;position:sticky;top:env(safe-area-inset-top,0px);z-index:10;box-shadow:0 1px 0 var(--line)}
+.bar .in{max-width:1040px;margin:0 auto;padding-inline:16px;display:flex;align-items:center;gap:26px;height:60px;overflow-x:auto}
+.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;white-space:nowrap}
+.logo img{width:34px;height:34px}
+.bar nav{display:flex;gap:22px;font-size:14px}
+.bar nav a{color:var(--dim);text-decoration:none;white-space:nowrap;padding-block:6px}
+.bar nav a:hover,.bar nav a:focus-visible{color:var(--text);outline:none;box-shadow:inset 0 -2px 0 var(--mint)}
+.bar .get{margin-left:auto;background:var(--mint);color:#141129;font-size:14px;font-weight:700;padding:7px 14px;text-decoration:none;white-space:nowrap;clip-path:var(--notch)}
+
+main{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:30px 0;display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:stretch}
+#notes{flex:1}
+.feat .ovl,.feat .hud,.feat .strip,.feat .cgrid{margin-top:auto}
+.feat p{margin-bottom:16px!important}
+.full{grid-column:1/-1}
+.col,.side{display:flex;flex-direction:column;gap:22px;min-width:0}
+
+.box{background:var(--panel);padding:24px;position:relative;min-width:0;clip-path:var(--notch)}
+.box h2{font-family:var(--px);font-size:22px;font-weight:700;color:var(--gold);margin:0 0 16px;line-height:1.3;display:flex;align-items:center;gap:10px}
+.box h2::before{content:"";width:10px;height:10px;background:var(--gold);flex:none}
+.tabname{display:none}
+
+.intro{display:grid;grid-template-columns:112px 1fr;gap:20px;align-items:center;margin-bottom:22px}
+.intro img{width:112px;height:112px;animation:bob 1.6s steps(2) infinite}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.intro h1{font-family:var(--px);font-size:33px;font-weight:700;line-height:1.35;margin:0 0 8px}
+.intro h1 b{color:var(--mint)}
+.intro p{margin:0;color:var(--sub)}
+.intro p .lead{color:var(--text);font-weight:700}
+.cursor{display:inline-block;width:8px;height:16px;background:var(--mint);vertical-align:-2px;margin-left:3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.intro img,.cursor{animation:none}}
+.grid{overflow-x:auto;background:#181433}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:15px;font-variant-numeric:tabular-nums}
+th,td{padding:10px 14px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--line)}
+thead th{background:var(--panel2);font-size:14px;font-weight:700;color:var(--text)}
+th:first-child,td:first-child{text-align:left;color:var(--sub);font-weight:500}
+tbody tr:last-child td{border-bottom:0}
+.tag{font-weight:700}
+.ok{color:var(--mint)}.no{color:var(--gold)}.risk{color:var(--pink)}
+.risk::before{content:"▲ ";font-size:10px;vertical-align:1px}
+.cap{font-size:13px;color:var(--dim);margin-top:10px}
+
+.ver{font-size:14px;color:var(--sub)}
+.dlbtn{display:block;text-align:center;background:var(--mint);color:#141129;font-family:var(--px);font-size:22px;font-weight:700;padding:14px 10px;margin:14px 0 16px;text-decoration:none;clip-path:var(--notch)}
+.dlbtn:hover{background:#a6f0d7}
+.dlbtn:active{transform:translateY(2px)}
+.req{background:#3a2140;padding:12px 14px;font-size:15px;color:var(--text);clip-path:var(--notch)}
+.req b{color:var(--pink);display:block;font-size:14px}
+dl.spec{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:16px 0 0;font-size:15px}
+dl.spec dt{color:var(--dim)}
+dl.spec dd{margin:0}
+ul.skills{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+ul.skills li{display:grid;grid-template-columns:40px 1fr;gap:12px;font-size:15px;color:var(--sub);line-height:1.65}
+ul.skills .ic{width:40px;height:40px;background:var(--panel2);display:grid;place-items:center;font-size:18px;font-weight:700;color:var(--violet);clip-path:var(--notch)}
+ul.skills b{color:var(--text);display:block;font-weight:700}
+
+ol.tut{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ol.tut li{display:grid;grid-template-columns:46px 1fr;gap:12px;background:var(--panel2);padding:14px 16px;clip-path:var(--notch)}
+ol.tut .n{font-family:var(--px);font-size:22px;font-weight:700;color:var(--mint);line-height:1.2}
+ol.tut b{display:block}
+ol.tut span{color:var(--sub);font-size:15px}
+kbd{font-family:var(--body);font-size:13px;font-weight:700;background:var(--panel2);padding:1px 6px;color:var(--text)}
+.notes p{margin:0 0 14px;font-size:15px;color:var(--sub)}
+.rel{margin-bottom:14px}
+.rel ul{margin:4px 0 0;padding-left:18px;font-size:15px;color:var(--sub)}
+.rel li{margin-bottom:2px}
+.more{font-size:14px;font-weight:700;text-decoration:none}
+.notes .v{font-weight:700;color:var(--violet);display:block;font-size:14px}
+
+.qa{margin:0;display:grid}
+.qa div{display:grid;grid-template-columns:300px 1fr;gap:24px;padding:14px 0;border-top:1px solid var(--line);min-width:0}
+.qa div:first-child{border-top:0;padding-top:4px}
+.qa dt{font-weight:700}
+.qa dt::before{content:"Q. ";color:var(--gold)}
+.qa dd{margin:0;color:var(--sub);font-size:15px}
+@media (max-width:700px){.qa div{grid-template-columns:1fr;gap:4px}}
+
+footer{max-width:1040px;margin:36px auto 0;padding-inline:16px;padding-block:0 40px;font-size:13px;color:var(--dim);text-align:center;line-height:1.9}
+
+
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.feats3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.feat{background:var(--panel2);padding:20px;clip-path:var(--notch);min-width:0;display:flex;flex-direction:column}
+.ft{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.feat h3{margin:0;font-size:18px;font-weight:700;line-height:1.3}
+.feat p{margin:0;color:var(--sub);font-size:15px;line-height:1.7}
+.feat .ic{width:40px;height:40px;background:#181433;display:grid;place-items:center;font-size:18px;font-weight:700;color:var(--violet);clip-path:var(--notch);flex:none}
+.feat.warn .ic{color:var(--pink)}
+/* 실제 오버레이 모양(앱 overlay-aether.css 값) */
+.ovl,.hud{margin-top:16px;background:rgba(12,12,15,.92);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:10px;color:#f4f4f5;font-size:13px}
+.ovl{display:grid;gap:6px}
+.toast{background:rgba(139,233,200,.07);border:1px solid rgba(139,233,200,.22);border-left:3px solid #8be9c8;padding:5px 10px;display:grid;gap:4px}
+.th{display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.3}
+.ck{width:15px;height:15px;border-radius:50%;background:#8be9c8;color:#0c0c0f;font-size:10px;font-weight:800;display:inline-grid;place-items:center;flex:none}
+.tl{color:#8be9c8;font-size:12px;font-weight:600}
+.tt{font-size:14px;font-weight:500}
+.tc{display:flex;gap:6px}.tc span{border-radius:999px;padding:0 8px;background:rgba(255,255,255,.06);font-size:12px;font-variant-numeric:tabular-nums}
+.hud{padding:12px 14px}
+.hud-h{display:flex;align-items:center;gap:8px;font-size:15px}
+.ocat{display:inline-flex;filter:drop-shadow(0 0 4px rgba(139,233,200,.35))}
+.ocat rect{fill:url(#ocat-fur)}.ocat .e{fill:#0c0c0f}.ocat .n{fill:#ff9fb8}
+.ocat-b{animation:ocat-bob 1.2s steps(1) infinite}
+@keyframes ocat-bob{0%,74%{transform:translateY(0)}75%,100%{transform:translateY(-1px)}}
+.hud-h .dots{margin-left:-6px;letter-spacing:1px}
+.dots span{display:inline-block;animation:odot 1.2s steps(1) infinite;color:#8b8b95}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes odot{0%,60%{opacity:1}61%,100%{opacity:.15}}
+@media (prefers-reduced-motion:reduce){.ocat-b,.dots span{animation:none}}
+.hud-h span{color:#8b8b95}.hud-h .lock{margin-left:auto;font-size:13px}
+.hud-r{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ri{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border-radius:999px;padding:3px 12px 3px 6px;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ri img{width:20px;height:20px}
+em{font-style:normal}.v{color:#9aa4ff}.m{color:#8be9c8}
+.hud-p{text-align:right;color:#8b8b95;font-size:11px;margin-top:6px}
+/* 관리표 위 계정 공유 자원 줄(앱 모양) */
+.strip{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;background:#0f0c20;padding:12px;border-radius:12px}
+.sc{display:inline-flex;align-items:baseline;gap:8px;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 12px;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sc i{font-style:normal;color:#a1a1aa;font-size:13px}.sc b{font-weight:700}
+.sc .acc{color:#8be9c8;font-weight:700}
+.sc.wide{flex-wrap:wrap}
+.cgrid{margin-top:16px;overflow-x:auto;background:#0f0c20;border-radius:12px;padding:6px 8px}
+.cgrid table{min-width:360px;font-size:14px}
+.cgrid th,.cgrid td{padding:7px 10px;border-bottom:1px solid #ffffff12}
+.cgrid thead th{background:none;font-size:13px;color:var(--sub)}
+.cgrid tbody tr:last-child td{border-bottom:0}
+.cb{display:inline-grid;place-items:center;width:20px;height:20px;border:2px solid #5a5490;border-radius:5px;font-size:12px;font-weight:800;vertical-align:middle}
+.cb.on{background:var(--mint);border-color:var(--mint);color:#141129}
+.cb{color:transparent}
+.cb.on{color:#141129}
+.cb.a1,.cb.a2,.cb.a3{animation:6s steps(1) infinite}
+.cb.a1{animation-name:ck1}.cb.a2{animation-name:ck2}.cb.a3{animation-name:ck3}
+@keyframes ck1{0%,19%{background:none;border-color:#5a5490;color:transparent;transform:none}20%{background:var(--mint);border-color:var(--mint);color:#141129;transform:scale(1.25)}23%,90%{background:var(--mint);border-color:var(--mint);color:#141129;transform:none}91%,100%{background:none;border-color:#5a5490;color:transparent}}
+@keyframes ck2{0%,37%{background:none;border-color:#5a5490;color:transparent;transform:none}38%{background:var(--mint);border-color:var(--mint);color:#141129;transform:scale(1.25)}41%,90%{background:var(--mint);border-color:var(--mint);color:#141129;transform:none}91%,100%{background:none;border-color:#5a5490;color:transparent}}
+@keyframes ck3{0%,55%{background:none;border-color:#5a5490;color:transparent;transform:none}56%{background:var(--mint);border-color:var(--mint);color:#141129;transform:scale(1.25)}59%,90%{background:var(--mint);border-color:var(--mint);color:#141129;transform:none}91%,100%{background:none;border-color:#5a5490;color:transparent}}
+@media (prefers-reduced-motion:reduce){.cb.a1,.cb.a2,.cb.a3{animation:none;background:var(--mint);border-color:var(--mint);color:#141129}}
+.toast.n1,.toast.n2,.toast.n3{animation:6s linear infinite}
+.toast.n1{animation-name:tn1}.toast.n2{animation-name:tn2}.toast.n3{animation-name:tn3}
+@keyframes tn1{0%,19%{opacity:0;transform:translateY(6px)}23%,90%{opacity:1;transform:none}93%,100%{opacity:0}}
+@keyframes tn2{0%,37%{opacity:0;transform:translateY(6px)}41%,90%{opacity:1;transform:none}93%,100%{opacity:0}}
+@keyframes tn3{0%,55%{opacity:0;transform:translateY(6px)}59%,90%{opacity:1;transform:none}93%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.toast.n1,.toast.n2,.toast.n3{animation:none}}
+@media (max-width:860px){.feats{grid-template-columns:1fr}.feats3{grid-template-columns:1fr}}
+#how ol.tut{grid-template-columns:repeat(4,1fr)}
+#how ol.tut li{grid-template-columns:1fr;gap:4px}
+@media (max-width:860px){#how ol.tut{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){#how ol.tut{grid-template-columns:1fr}}
+@media (max-width:860px){main{display:flex;flex-direction:column;align-items:stretch;gap:22px}.side{display:contents}#about{order:1}#dl{order:2}#sk{order:3}#how{order:4}#notes{order:5}#faq{order:6}}
+@media (max-width:520px){.intro{grid-template-columns:72px 1fr;gap:14px}.intro img{width:72px;height:72px}.intro h1{font-size:22px}.bar .in{gap:16px}.bar nav{gap:14px;font-size:13px}.logo{font-size:18px}.logo img{width:28px;height:28px}.bar .get{display:none}.box{padding:18px}}
+</style>
+</head>
+<body>
+
+<header class="bar" id="top"><div class="in">
+  <div class="logo px"><img class="pixel" src="assets/icon.png" alt="">데바로그</div>
+  <nav aria-label="메뉴"><a href="#top">홈</a><a href="#sk">소개</a><a href="#how">사용법</a><a href="#faq">FAQ</a></nav>
+  <a class="get" href="https://github.com/dalmang-e/DevaLog-Releases/releases/latest" target="_blank" rel="noopener">▶ 다운로드</a>
+</div></header>
+
+<main>
+  <section class="box" id="about">
+    <span class="tabname">데바로그</span>
+    <div class="intro">
+      <img class="pixel" src="assets/cat.png" alt="날개 달린 고양이 데바로그 마스코트">
+      <div>
+        <h1>이번 주 숙제,<br><b>몇 개 남았는지</b> 알아?</h1>
+        <p><b class="lead">게임은 네가, 기록은 내가!</b><br>데바로그만 켜 두면 캐릭터의 숙제 정보가 표에 저절로 채워져<span class="cursor"></span></p>
+      </div>
+    </div>
+    <div class="grid"><table>
+      <thead><tr><th>항목</th><th>데바냥</th><th>데바1</th><th>데바2</th><th>데바3</th></tr></thead>
+      <tbody>
+        <tr><td>오드 에너지</td><td>285 (+5,830)</td><td>60 (+3,250)</td><td>340 (+4,220)</td><td>15 (+9,460)</td></tr>
+        <tr><td>악몽</td><td><span class="tag risk">14회</span></td><td><span class="tag risk">14회</span></td><td>7회</td><td><span class="tag risk">14회</span></td></tr>
+        <tr><td>각성전</td><td>0회 (+3회)</td><td>0회 (+5회)</td><td>0회 (+8회)</td><td>0회 (+4회)</td></tr>
+        <tr><td>루드라</td><td><span class="tag ok">완료</span></td><td><span class="tag no">미완료</span></td><td><span class="tag ok">완료</span></td><td><span class="tag ok">완료</span></td></tr>
+        <tr><td>침식의 정화소</td><td><span class="tag ok">완료</span></td><td><span class="tag ok">완료</span></td><td><span class="tag ok">완료</span></td><td><span class="tag no">미완료</span></td></tr>
+        <tr><td>무스펠</td><td><span class="tag ok">완료</span></td><td><span class="tag ok">완료</span></td><td><span class="tag no">미완료</span></td><td><span class="tag ok">완료</span></td></tr>
+        <tr><td>비탄의 설원</td><td><span class="tag no">미완료</span></td><td><span class="tag ok">완료</span></td><td><span class="tag ok">완료</span></td><td><span class="tag ok">완료</span></td></tr>
+        <tr><td>히든 큐브 열쇠</td><td>2개</td><td>0개</td><td>3개</td><td>1개</td></tr>
+        <tr><td>키나</td><td>5,893,877</td><td>4,368,374</td><td>2,379,231</td><td>10,000,000</td></tr>
+      </tbody>
+    </table></div>
+    <div class="cap">관리표 예시 (캐릭터 이름과 숫자는 예시). 빨간 칸은 꽉 차서 버려질 위험이 있는 횟수예요.</div>
+  </section>
+
+  <div class="side">
+    <section class="box" id="dl">
+      <h2>다운로드</h2>
+      <div class="ver">최신 v1.0.27 · 2026.10.03</div>
+      <a class="dlbtn" href="https://github.com/dalmang-e/DevaLog-Releases/releases/latest" target="_blank" rel="noopener">▶ 설치 파일 받기</a>
+      <div class="req"><b>먼저 설치</b>Npcap (무료). 없으면 자동 기록이 동작하지 않아요.</div>
+      <dl class="spec"><dt>운영체제</dt><dd>Windows 10 / 11 (64비트)</dd></dl>
+    </section>
+  <section class="box notes" id="notes">
+    <h2>패치노트</h2>
+    <div class="rel"><span class="v">v1.0.27 · 2026.10.03</span><ul><li>캐릭터 전환 시 템렙·전투력 자동 갱신</li><li>원정 퇴장 직후 불필요한 게임 정보 재연결 방지</li><li>원정 보상과 장비 자동 추출 뒤 키나 즉시 반영</li></ul></div>
+    <div class="rel"><span class="v">v1.0.26 · 2026.10.02</span><ul><li>오버레이 바로 옆의 게임 화면이 클릭되지 않던 문제를 고쳤습니다.</li></ul></div>
+    <a class="more" href="https://github.com/dalmang-e/DevaLog-Releases/releases" target="_blank" rel="noopener">전체 패치노트 보기 →</a>
+  </section>
+  </div>
+
+  <section class="box full" id="sk">
+    <h2>할 수 있는 것</h2>
+    <div class="feats">
+      <article class="feat">
+        <div class="ft"><span class="ic">⟳</span><h3>알아서 기록</h3></div>
+        <p>던전, 우편, 아이템 사용처럼 숫자가 바뀌는 순간을 알아채서 관리표를 바로 고치고, 게임 위에 이렇게 알려 줘요. 확실하지 않으면 혼자 정하지 않고 먼저 물어봐요.</p>
+        <div class="ovl">
+          <div class="toast"><div class="th"><span class="ck">✓</span><span class="tl">자동 반영</span><span class="tt">각성전 0(+28) → 0(+27)회</span></div></div>
+          <div class="toast n1"><div class="th"><span class="ck">✓</span><span class="tl">자동 반영</span><span class="tt">오드 에너지(각인) +4개</span></div><div class="tc"><span>66개 보유 중</span></div></div>
+          <div class="toast n2"><div class="th"><span class="ck">✓</span><span class="tl">자동 반영</span><span class="tt">작은 오드 에너지(각인) 2개 사용</span></div><div class="tc"><span>79 → 77개</span></div></div>
+          <div class="toast n3"><div class="th"><span class="ck">✓</span><span class="tl">자동 반영</span><span class="tt">무스펠 완료</span></div></div>
+        </div>
+      </article>
+      <article class="feat">
+        <div class="ft"><span class="ic">✚</span><h3>커스텀 관리</h3></div>
+        <p>어비스 아티, 시련, 시즌 점수 11,000점 달성, 이벤트 아이템처럼 따로 챙기고 싶은 나만의 관리 항목을 직접 추가해서 캐릭터마다 체크할 수 있어요.</p>
+        <div class="cgrid"><table>
+          <thead><tr><th></th><th>데바냥</th><th>데바1</th><th>데바2</th></tr></thead>
+          <tbody>
+            <tr><td>어비스 아티 (하층)</td><td><span class="cb on">✓</span></td><td><span class="cb on">✓</span></td><td><span class="cb"></span></td></tr>
+            <tr><td>시련</td><td><span class="cb a1">✓</span></td><td><span class="cb"></span></td><td><span class="cb"></span></td></tr>
+            <tr><td>시즌 점수 11,000점</td><td><span class="cb on">✓</span></td><td><span class="cb on">✓</span></td><td><span class="cb a3">✓</span></td></tr>
+            <tr><td>이벤트 아이템 교환</td><td><span class="cb"></span></td><td><span class="cb a2">✓</span></td><td><span class="cb"></span></td></tr>
+          </tbody></table></div>
+      </article>
+      <article class="feat">
+        <div class="ft"><span class="ic">▣</span><h3>게임 위 작은 창</h3></div>
+        <p>게임 화면 구석에 지금 접속한 캐릭터와 슈고 열쇠, 차원 침공 열쇠, 오드가 늘 떠 있어요. 창을 바꾸지 않아도 바로 확인할 수 있어요.</p>
+        <div class="hud">
+          <div class="hud-h"><span class="ocat" aria-hidden="true"><svg viewBox="0 0 16 16" width="28" height="28" shape-rendering="crispEdges"><defs><linearGradient id="ocat-fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b6f5dd"/><stop offset="0.55" stop-color="#8be9c8"/><stop offset="1" stop-color="#8f9bff"/></linearGradient></defs><g class="ocat-b"><rect x="3" y="2" width="1" height="1"/><rect x="3" y="3" width="2" height="1"/><rect x="11" y="2" width="1" height="1"/><rect x="10" y="3" width="2" height="1"/><rect x="3" y="4" width="9" height="4"/><rect x="4" y="8" width="8" height="3"/><rect x="12" y="7" width="1" height="3"/><rect x="13" y="6" width="1" height="2"/><rect x="5" y="11" width="2" height="2"/><rect x="9" y="11" width="2" height="2"/><rect class="e" x="5" y="5" width="1" height="2"/><rect class="e" x="9" y="5" width="1" height="2"/><rect class="n" x="7" y="6" width="1" height="1"/></g></svg></span><b>데바냥</b><span>관리 중</span><span class="dots"><span>·</span><span>·</span><span>·</span></span><span class="lock">🔒</span></div>
+          <div class="hud-r">
+            <span class="ri"><img src="assets/shugo.png" alt="슈고 열쇠">0 <em class="v">(+21)</em></span>
+            <span class="ri"><img src="assets/inv.png" alt="차원 침공 열쇠">0</span>
+            <span class="ri"><img src="assets/od.png" alt="오드 에너지">35 <em class="v">(+1995)</em> <em class="m">(+2640)</em></span>
+          </div>
+          <div class="hud-p">CPU 0.1% · RAM 154MB</div>
+        </div>
+      </article>
+      <article class="feat">
+        <div class="ft"><span class="ic">◆</span><h3>계정 공유 자원</h3></div>
+        <p>사명, 슈고, 차원 침공처럼 계정 전체가 함께 쓰는 횟수와 계정 전체 오드·키나 합계를 관리표 맨 위 한 줄에 모아요.</p>
+        <div class="strip">
+          <span class="sc"><i>사명</i><b>5회 완료</b></span>
+          <span class="sc"><i>슈고</i><b>1회 <em class="v">(+26회)</em></b></span>
+          <span class="sc"><i>차원 침공</i><b>0회</b></span>
+          <span class="sc wide"><i class="acc">계정 자원</i><i>오드 전체</i><b>43,930</b><i>키나</i><b>31,511,078</b></span>
+        </div>
+      </article>
+    </div>
+    <div class="feats3">
+      <article class="feat">
+        <div class="ft"><span class="ic">☰</span><h3>통합 관리표</h3></div>
+        <p>모든 캐릭터를 한 표에서 나란히 비교해요. 계정은 최대 2개까지 등록해 탭으로 오갈 수 있어요.</p>
+      </article>
+      <article class="feat">
+        <div class="ft"><span class="ic">✦</span><h3>가방 속 오드까지</h3></div>
+        <p>가방에 쌓아 둔 오드 아이템을 충전량으로 바꿔 더해 보여 줘요. 사용 기간이 정해진 오드가 몇 개인지도 따로 볼 수 있어요.</p>
+      </article>
+      <article class="feat warn">
+        <div class="ft"><span class="ic">!</span><h3>손실 경고</h3></div>
+        <p>악몽처럼 꽉 차서 다음 충전이 버려질 횟수를 미리 빨갛게 알려 줘요.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="box full" id="how">
+    <h2>사용법</h2>
+    <ol class="tut">
+      <li><span class="n">1</span><div><b>Npcap 설치</b><span>설치 파일 실행 → 권한 요청에서 '예' → 기본 옵션 그대로 Install</span></div></li>
+      <li><span class="n">2</span><div><b>데바로그 설치</b><span>"Windows의 PC 보호" 창이 뜨면 [추가 정보] → [실행]</span></div></li>
+      <li><span class="n">3</span><div><b>캐릭터 추가</b><span>관리표의 [+ 캐릭터 추가]에서 서버와 이름 입력</span></div></li>
+      <li><span class="n">4</span><div><b>게임 접속</b><span>데바로그를 켜 둔 채 게임에 들어가면 자동 기록 시작</span></div></li>
+    </ol>
+  </section>
+
+  <section class="box full" id="faq">
+    <h2>자주 묻는 질문</h2>
+    <dl class="qa">
+      <div><dt>게임 계정 정보를 입력하나요?</dt><dd>아니요. 캐릭터 서버와 이름만 입력해요.</dd></div>
+      <div><dt>게임을 대신 조작하나요?</dt><dd>아니요. 키보드나 마우스를 대신 누르지 않아요.</dd></div>
+      <div><dt>기록은 어디에 저장되나요?</dt><dd>내 PC 안에만 저장돼요.</dd></div>
+      <div><dt>값이 틀리게 들어갔어요.</dt><dd>관리표에서 칸을 눌러 바로 고칠 수 있어요. 반복되면 설정 → 진단자료 내보내기로 알려 주세요.</dd></div>
+      <div><dt>공식 프로그램인가요?</dt><dd>아니요. 개인이 만든 비공식 팬 프로그램이에요.</dd></div>
+    </dl>
+  </section>
+</main>
+
+<footer>데바로그는 비공식 팬 프로그램입니다. AION2 및 관련 상표는 NCSOFT의 자산입니다.</footer>
+<script src="assets/site.js" defer></script>
+</body>
+</html>
