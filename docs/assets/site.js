@@ -18,8 +18,7 @@
       var ver = document.querySelector('.ver');
       if (ver) ver.textContent = '최신 ' + top.tag_name + ' · ' + day(top.published_at);
       var exe = (top.assets || []).filter(function (a) { return /\.exe$/i.test(a.name); })[0];
-      var btn = document.querySelector('.dlbtn');
-      if (btn && exe) btn.href = exe.browser_download_url;
+      if (exe) document.querySelectorAll('.dlbtn, .get').forEach(function (a) { a.href = exe.browser_download_url; });
       var notes = document.getElementById('notes');
       var more = notes && notes.querySelector('.more');
       if (!notes || !more) return;
