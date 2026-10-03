@@ -64,7 +64,6 @@ main{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:30px 0;dis
 .intro p .lead{color:var(--text);font-weight:700}
 .cursor{display:inline-block;width:8px;height:16px;background:var(--mint);vertical-align:-2px;margin-left:3px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-@media (prefers-reduced-motion:reduce){.intro img,.cursor{animation:none}}
 .grid{overflow-x:auto;background:#181433}
 table{border-collapse:collapse;width:100%;min-width:560px;font-size:15px;font-variant-numeric:tabular-nums}
 th,td{padding:10px 14px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--line)}
@@ -141,7 +140,6 @@ footer{max-width:1040px;margin:36px auto 0;padding-inline:16px;padding-block:0 4
 .dots span{display:inline-block;animation:odot 1.2s steps(1) infinite;color:#8b8b95}
 .dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
 @keyframes odot{0%,60%{opacity:1}61%,100%{opacity:.15}}
-@media (prefers-reduced-motion:reduce){.ocat-b,.dots span{animation:none}}
 .hud-h span{color:#8b8b95}.hud-h .lock{margin-left:auto;font-size:13px}
 .hud-r{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .ri{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border-radius:999px;padding:3px 12px 3px 6px;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -168,13 +166,11 @@ em{font-style:normal}.v{color:#9aa4ff}.m{color:#8be9c8}
 @keyframes ck1{0%,19%{background:none;border-color:#5a5490;color:transparent;transform:none}20%{background:var(--mint);border-color:var(--mint);color:#141129;transform:scale(1.25)}23%,90%{background:var(--mint);border-color:var(--mint);color:#141129;transform:none}91%,100%{background:none;border-color:#5a5490;color:transparent}}
 @keyframes ck2{0%,37%{background:none;border-color:#5a5490;color:transparent;transform:none}38%{background:var(--mint);border-color:var(--mint);color:#141129;transform:scale(1.25)}41%,90%{background:var(--mint);border-color:var(--mint);color:#141129;transform:none}91%,100%{background:none;border-color:#5a5490;color:transparent}}
 @keyframes ck3{0%,55%{background:none;border-color:#5a5490;color:transparent;transform:none}56%{background:var(--mint);border-color:var(--mint);color:#141129;transform:scale(1.25)}59%,90%{background:var(--mint);border-color:var(--mint);color:#141129;transform:none}91%,100%{background:none;border-color:#5a5490;color:transparent}}
-@media (prefers-reduced-motion:reduce){.cb.a1,.cb.a2,.cb.a3{animation:none;background:var(--mint);border-color:var(--mint);color:#141129}}
 .toast.n1,.toast.n2,.toast.n3{animation:6s linear infinite}
 .toast.n1{animation-name:tn1}.toast.n2{animation-name:tn2}.toast.n3{animation-name:tn3}
 @keyframes tn1{0%,19%{opacity:0;transform:translateY(6px)}23%,90%{opacity:1;transform:none}93%,100%{opacity:0}}
 @keyframes tn2{0%,37%{opacity:0;transform:translateY(6px)}41%,90%{opacity:1;transform:none}93%,100%{opacity:0}}
 @keyframes tn3{0%,55%{opacity:0;transform:translateY(6px)}59%,90%{opacity:1;transform:none}93%,100%{opacity:0}}
-@media (prefers-reduced-motion:reduce){.toast.n1,.toast.n2,.toast.n3{animation:none}}
 @media (max-width:860px){.feats{grid-template-columns:1fr}.feats3{grid-template-columns:1fr}}
 #how ol.tut{grid-template-columns:repeat(4,1fr)}
 #how ol.tut li{grid-template-columns:1fr;gap:4px}
