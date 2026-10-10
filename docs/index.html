@@ -45,6 +45,9 @@ img{max-width:100%}
 
 main{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:30px 0;display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:stretch}
 #notes{flex:1}
+/* 패치노트 길이가 바뀌어도 관리표 높이가 흔들리지 않게: 오른쪽 열은 행 높이에 기여하지 않고, 넘치는 패치노트는 잘라서 흐리게 처리 */
+@media (min-width:861px){.side{height:0;min-height:100%;display:flex;flex-direction:column;gap:22px}#notes{min-height:0;display:flex;flex-direction:column;overflow:hidden}#notes .rels{flex:1;min-height:0;overflow:hidden;-webkit-mask-image:linear-gradient(#000 calc(100% - 36px),transparent);mask-image:linear-gradient(#000 calc(100% - 36px),transparent)}#notes .more{margin-top:10px}}
+.rel li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;list-style:none;margin-left:-14px}.rel li::before{content:"•";margin-right:8px;color:var(--sub)}
 .feat .ovl,.feat .hud,.feat .strip,.feat .cgrid{margin-top:auto}
 .feat p{margin-bottom:16px!important}
 .full{grid-column:1/-1}
@@ -225,8 +228,8 @@ em{font-style:normal}.v{color:#9aa4ff}.m{color:#8be9c8}
     </section>
   <section class="box notes" id="notes">
     <h2>패치노트</h2>
-    <div class="rel"><span class="v">v1.0.27 · 2026.10.03</span><ul><li>캐릭터 전환 시 템렙·전투력 자동 갱신</li><li>원정 퇴장 직후 불필요한 게임 정보 재연결 방지</li><li>원정 보상과 장비 자동 추출 뒤 키나 즉시 반영</li></ul></div>
-    <div class="rel"><span class="v">v1.0.26 · 2026.10.02</span><ul><li>오버레이 바로 옆의 게임 화면이 클릭되지 않던 문제를 고쳤습니다.</li></ul></div>
+    <div class="rels"><div class="rel"><span class="v">v1.0.27 · 2026.10.03</span><ul><li>캐릭터 전환 시 템렙·전투력 자동 갱신</li><li>원정 퇴장 직후 불필요한 게임 정보 재연결 방지</li><li>원정 보상과 장비 자동 추출 뒤 키나 즉시 반영</li></ul></div>
+    <div class="rel"><span class="v">v1.0.26 · 2026.10.02</span><ul><li>오버레이 바로 옆의 게임 화면이 클릭되지 않던 문제를 고쳤습니다.</li></ul></div></div>
     <a class="more" href="https://github.com/dalmang-e/DevaLog-Releases/releases" target="_blank" rel="noopener">전체 패치노트 보기 →</a>
   </section>
   </div>

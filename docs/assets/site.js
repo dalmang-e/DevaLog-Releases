@@ -25,7 +25,8 @@
       var shown = list.map(function (r) { return { r: r, b: bullets(r.body) }; })
         .filter(function (x) { return x.b.length; }).slice(0, 2);
       if (!shown.length) return;
-      notes.querySelectorAll('.rel').forEach(function (el) { el.remove(); });
+      var box = notes.querySelector('.rels') || notes;
+      box.querySelectorAll('.rel').forEach(function (el) { el.remove(); });
       shown.forEach(function (x) {
         var div = document.createElement('div'); div.className = 'rel';
         var v = document.createElement('span'); v.className = 'v';
@@ -33,7 +34,7 @@
         var ul = document.createElement('ul');
         x.b.forEach(function (t) { var li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
         div.appendChild(v); div.appendChild(ul);
-        notes.insertBefore(div, more);
+        if (box === notes) notes.insertBefore(div, more); else box.appendChild(div);
       });
     })
     .catch(function () {});
